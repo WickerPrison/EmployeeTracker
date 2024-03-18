@@ -94,4 +94,16 @@ function addEmpl(first_name, last_name, role_id, manager_id, callback){
     })
 }
 
-module.exports = {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl}
+function updateEmpl(employee_id, role_id, manager_id, callback){
+    db.query(`UPDATE employee SET role_id = ${role_id}, manager_id = ${manager_id} WHERE id = ${employee_id}`, (err, result) =>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log("Employee Updated");
+            callback();
+        }
+    })
+}
+
+module.exports = {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl, updateEmpl}

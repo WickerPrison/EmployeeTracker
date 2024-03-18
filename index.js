@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl} = require("./queries.js");
+const {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl, updateEmpl} = require("./queries.js");
 
 function mainMenu(){
     inquirer
@@ -15,8 +15,8 @@ function mainMenu(){
                 {name: "Add a department", value: "addDept"},
                 {name: "Add a role", value: "addRole"},
                 {name: "Add an Employee", value: "addEmpl"},
+                {name: "Update Employee Information", value:"updEmpl"},
                 {name: "Close application", value: "close"}
-                // update an employee role
             ]
         }
     ])
@@ -39,6 +39,9 @@ function mainMenu(){
                 break;
             case "addEmpl":
                 addEmplQuestions();
+                break;
+            case "updEmpl":
+                updateEmplQuestions(true);
                 break;
             case "close":
                 process.exit();
@@ -135,6 +138,49 @@ function addEmplQuestions(){
             ])
             .then((response) => {
                 addEmpl(response.firstName, response.lastName, response.emplRole, response.emplManager, mainMenu);
+            });
+        }, false)
+    }, false)
+}
+
+function updateEmplQuestions(){
+    viewRoles((result) => {
+        let roleChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            roleChoices.push({name: result[i].Job_Title, value: result[i].Role_ID});
+        }
+
+        viewEmployees((result) => {
+            let emplChoices = [];
+
+            for(let i = 0; i < result.length; i++){
+                emplChoices.push({name: result[i].First_Name + " " + result[i].Last_Name, value: result[i].Employee_ID});
+            }
+
+            inquirer
+            .prompt([
+                {
+                    type: "list",
+                    message: "Which employee would you like to update?",
+                    name: "emplUpd",
+                    choices: emplChoices
+                },
+                {
+                    type: "list",
+                    message: "What is this employee's new job title?",
+                    name: "emplRole",
+                    choices: roleChoices
+                },
+                {
+                    type: "list",
+                    message:"Who is this employee's new manager?",
+                    name: "emplManager",
+                    choices: emplChoices
+                }
+            ])
+            .then((response) => {
+                updateEmpl(response.emplUpd, response.emplRole, response.emplManager, mainMenu);
             });
         }, false)
     }, false)
