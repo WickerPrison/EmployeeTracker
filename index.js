@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const {viewDepartments, viewRoles, viewEmployees, addDept, addRole} = require("./queries.js");
+const {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl} = require("./queries.js");
 
 function mainMenu(){
     inquirer
@@ -14,8 +14,8 @@ function mainMenu(){
                 {name: "View all employees", value: "viewEmpl"},
                 {name: "Add a department", value: "addDept"},
                 {name: "Add a role", value: "addRole"},
+                {name: "Add an Employee", value: "addEmpl"},
                 {name: "Close application", value: "close"}
-                // add an employee
                 // update an employee role
             ]
         }
@@ -36,6 +36,9 @@ function mainMenu(){
                 break;
             case "addRole":
                 addRoleQuestions();
+                break;
+            case "addEmpl":
+                addEmplQuestions();
                 break;
             case "close":
                 process.exit();
@@ -87,7 +90,54 @@ function addRoleQuestions(){
         .then((response) => {
             addRole(response.roleName, response.salary, response.department, mainMenu);
         });
-    })
+    }, false)
+}
+
+function addEmplQuestions(){
+    viewRoles((result) => {
+        let roleChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            roleChoices.push({name: result[i].Job_Title, value: result[i].Role_ID});
+        }
+
+        viewEmployees((result) => {
+            let managerChoices = [];
+
+            for(let i = 0; i < result.length; i++){
+                managerChoices.push({name: result[i].First_Name + " " + result[i].Last_Name, value: result[i].Employee_ID});
+            }
+
+            inquirer
+            .prompt([
+                {
+                    type: "input",
+                    message: "What is the employee's first name?",
+                    name: "firstName",
+                },
+                {
+                    type: "input",
+                    message: "What is the employee's last name?",
+                    name: "lastName",
+                },
+                {
+                    type: "list",
+                    message: "What is this employee's job title?",
+                    name: "emplRole",
+                    choices: roleChoices
+                },
+                {
+                    type: "list",
+                    message:"Who is this employee's manager?",
+                    name: "emplManager",
+                    choices: managerChoices
+                }
+            ])
+            .then((response) => {
+                addEmpl(response.firstName, response.lastName, response.emplRole, response.emplManager, mainMenu);
+            });
+        }, false)
+    }, false)
 }
 
 mainMenu();
