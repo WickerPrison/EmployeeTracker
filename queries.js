@@ -16,7 +16,7 @@ function viewDepartments(callback){
         }
         else{
             console.table(result);
-            callback();
+            callback(result);
         }
     });
 }
@@ -45,11 +45,32 @@ function viewEmployees(callback){
             console.log(err);
         }
         else{
-            console.log(result);
             console.table(result);
             callback();
         }
     });
 }
 
-module.exports = {viewDepartments, viewRoles, viewEmployees}
+function addDept(name, callback){
+    db.query(`INSERT INTO department (name) VALUES (?)`, name, (err, result) =>{
+        if(err) {
+            console.log(err);
+        }
+        else{
+            callback();
+        }
+    })
+}
+
+function addRole(title, salary, department_id, callback){
+    db.query(`INSERT INTO role (title, salary, department_id) VALUES ("?", ${salary}, ${department_id})`, title, (err, result) =>{
+        if(err) {
+            console.log(err);
+        }
+        else{
+            callback();
+        }
+    })
+}
+
+module.exports = {viewDepartments, viewRoles, viewEmployees, addDept, addRole}
