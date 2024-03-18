@@ -13,12 +13,12 @@ VALUES ("Network Administration", 80000.00, 1),
        ("Accounting Manager", 93000.00, 3);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Alex", "Wilkinson", 3, null), 
+VALUES ("Frank", "Wilkinson", 3, 1), 
        ("Frankie", "Ross", 2, 1),
        ("Clem", "Gardner", 1, 1),
-       ("Harley", "Walker", 4, null), 
+       ("Carol", "Walker", 4, 4), 
        ("Casey", "Holland", 5, 4),
        ("Cory", "Sawyer", 5, 4),
-       ("Gail", "Forbes", 7, null), 
+       ("Dave", "Forbes", 7, 7), 
        ("Jessie", "Dillard", 6, 7),
        ("Jaden", "Gonzales", 6, 7);

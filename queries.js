@@ -10,33 +10,33 @@ const db = mysql.createConnection(
 );
 
 function viewDepartments(callback){
-    db.query("SELECT * FROM department", (err, result) => {
+    db.query("SELECT id AS Department_ID, name AS Department FROM department", (err, result) => {
         if(err) {
             console.log(err);
         }
         else{
-            console.log(result);
+            console.table(result);
             callback();
         }
     });
 }
 
 function viewRoles(callback){
-    db.query(`SELECT title, salary, department.name AS department 
+    db.query(`SELECT role.id AS Role_ID, title AS Job_Title, salary AS Salary, department.name AS Department 
     FROM role 
     JOIN department ON role.department_id = department.id`, (err, result) => {
         if(err) {
             console.log(err);
         }
         else{
-            console.log(result);
+            console.table(result);
             callback();
         }
     });
 }
 
 function viewEmployees(callback){
-    db.query(`SELECT employee.first_name, employee.last_name, role.title AS role, role.salary AS salary, department.name AS department, CONCAT_WS(" ", e2.first_name, e2.last_name) AS manager
+    db.query(`SELECT employee.id AS Employee_ID, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Job_Title, role.salary AS Salary, department.name AS Department, CONCAT_WS(" ", e2.first_name, e2.last_name) AS Manager
     FROM employee 
     JOIN role ON employee.role_id = role.id
     JOIN department ON role.department_id = department.id
@@ -46,6 +46,7 @@ function viewEmployees(callback){
         }
         else{
             console.log(result);
+            console.table(result);
             callback();
         }
     });
