@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const {viewDepartments} = require("./queries.js");
+const {viewDepartments, viewRoles, viewEmployees} = require("./queries.js");
 
 function mainMenu(){
     inquirer
@@ -26,8 +26,10 @@ function mainMenu(){
                 viewDepartments(mainMenu);
                 break;
             case "viewRoles":
+                viewRoles(mainMenu);
                 break;
             case "viewEmpl":
+                viewEmployees(mainMenu);
                 break;
             case "close":
                 process.exit();
