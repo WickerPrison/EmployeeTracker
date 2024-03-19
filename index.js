@@ -4,6 +4,7 @@ const {
     viewRoles, 
     viewEmployees, 
     viewEmpByMan,
+    viewEmpByDept,
     addDept, 
     addRole, 
     addEmpl, 
@@ -22,12 +23,11 @@ function mainMenu(){
                 {name: "View all roles", value: "viewRoles"},
                 {name: "View all employees", value: "viewEmpl"},
                 {name: "View employees by manager", value: "empByMan"},
+                {name: "View employees by department", value: "empByDept"},
                 {name: "Add a department", value: "addDept"},
                 {name: "Add a role", value: "addRole"},
                 {name: "Add an Employee", value: "addEmpl"},
                 {name: "Update Employee Information", value:"updEmpl"},
-                // view employees by manager
-                // view employees by department
                 // delete departments, roles, and employees
                 // view combined salaries of dept
                 {name: "Close application", value: "close"}
@@ -47,6 +47,9 @@ function mainMenu(){
                 break;
             case "empByMan":
                 empByManQuestions();
+                break;
+            case "empByDept":
+                empByDeptQuestions();
                 break;
             case "addDept":
                 addDeptQuestions();
@@ -85,6 +88,29 @@ function empByManQuestions(){
         ])
         .then((response) => {
             viewEmpByMan(response.manager, mainMenu);
+        });
+    }, false)
+}
+
+function empByDeptQuestions(){
+    viewDepartments((result) => {
+        let deptChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            deptChoices.push({name: result[i].Department, value: result[i].Department_ID});
+        }
+        
+        inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "Which department's employees would you like to view?",
+                name: "department",
+                choices: deptChoices
+            }
+        ])
+        .then((response) => {
+            viewEmpByDept(response.department, mainMenu);
         });
     }, false)
 }

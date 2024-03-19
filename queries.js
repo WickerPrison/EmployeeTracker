@@ -73,6 +73,22 @@ function viewEmpByMan(manager_id, callback){
     });
 }
 
+function viewEmpByDept(department_id, callback){
+    db.query(`SELECT employee.id AS Employee_ID, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Job_Title, role.salary AS Salary, CONCAT_WS(" ", e2.first_name, e2.last_name) AS Manager
+    FROM employee 
+    JOIN role ON employee.role_id = role.id
+    JOIN employee e2 ON employee.manager_id = e2.id
+    WHERE role.department_id = ?`, department_id, (err, result) => {
+        if(err) {
+            console.log(err);
+        }
+        else{
+            console.table(result);
+            callback();
+        }
+    });
+}
+
 function addDept(name, callback){
     db.query(`INSERT INTO department (name) VALUES (?)`, name, (err, result) =>{
         if(err) {
@@ -127,6 +143,7 @@ module.exports = {
     viewRoles, 
     viewEmployees,
     viewEmpByMan, 
+    viewEmpByDept,
     addDept, 
     addRole, 
     addEmpl, 
