@@ -5,6 +5,7 @@ const {
     viewEmployees, 
     viewEmpByMan,
     viewEmpByDept,
+    viewDeptSalary,
     addDept, 
     addRole, 
     addEmpl, 
@@ -24,6 +25,7 @@ function mainMenu(){
                 {name: "View all employees", value: "viewEmpl"},
                 {name: "View employees by manager", value: "empByMan"},
                 {name: "View employees by department", value: "empByDept"},
+                {name: "View combined salary of department", value: "deptSalary"},
                 {name: "Add a department", value: "addDept"},
                 {name: "Add a role", value: "addRole"},
                 {name: "Add an Employee", value: "addEmpl"},
@@ -50,6 +52,9 @@ function mainMenu(){
                 break;
             case "empByDept":
                 empByDeptQuestions();
+                break;
+            case "deptSalary":
+                viewDeptSalary(mainMenu);
                 break;
             case "addDept":
                 addDeptQuestions();

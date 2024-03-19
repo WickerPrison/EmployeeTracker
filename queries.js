@@ -89,6 +89,22 @@ function viewEmpByDept(department_id, callback){
     });
 }
 
+function viewDeptSalary(callback){
+    db.query(`SELECT department.name AS Department, SUM(role.salary) AS Combined_Salary
+    FROM employee 
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id
+    GROUP BY Department`, (err, result) => {
+        if(err) {
+            console.log(err);
+        }
+        else{
+            console.table(result);
+            callback();
+        }
+    });
+}
+
 function addDept(name, callback){
     db.query(`INSERT INTO department (name) VALUES (?)`, name, (err, result) =>{
         if(err) {
@@ -144,6 +160,7 @@ module.exports = {
     viewEmployees,
     viewEmpByMan, 
     viewEmpByDept,
+    viewDeptSalary,
     addDept, 
     addRole, 
     addEmpl, 
