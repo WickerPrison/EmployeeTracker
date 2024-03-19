@@ -1,16 +1,6 @@
 const inquirer = require('inquirer');
-const {
-    viewDepartments, 
-    viewRoles, 
-    viewEmployees, 
-    viewEmpByMan,
-    viewEmpByDept,
-    viewDeptSalary,
-    addDept, 
-    addRole, 
-    addEmpl, 
-    updateEmpl
-} = require("./queries.js");
+const Queries = require("./queries.js");
+queries = new Queries();
 
 function mainMenu(){
     inquirer
@@ -27,11 +17,12 @@ function mainMenu(){
                 {name: "View employees by department", value: "empByDept"},
                 {name: "View combined salary of department", value: "deptSalary"},
                 {name: "Add a department", value: "addDept"},
+                {name: "Delete a department", value: "deleteDepartment"},
                 {name: "Add a role", value: "addRole"},
-                {name: "Add an Employee", value: "addEmpl"},
-                {name: "Update Employee Information", value:"updEmpl"},
-                // delete departments, roles, and employees
-                // view combined salaries of dept
+                {name: "Delete a role", value: "deleteRole"},
+                {name: "Add an employee", value: "addEmpl"},
+                {name: "Update employee information", value:"updEmpl"},
+                {name: "Delete an employee", value: "deleteEmpl"},
                 {name: "Close application", value: "close"}
             ]
         }
@@ -39,13 +30,13 @@ function mainMenu(){
     .then((response) => {
         switch(response.action){
             case "viewDept":
-                viewDepartments(mainMenu);
+                queries.viewDepartments(mainMenu);
                 break;
             case "viewRoles":
-                viewRoles(mainMenu);
+                queries.viewRoles(mainMenu);
                 break;
             case "viewEmpl":
-                viewEmployees(mainMenu);
+                queries.viewEmployees(mainMenu);
                 break;
             case "empByMan":
                 empByManQuestions();
@@ -54,13 +45,19 @@ function mainMenu(){
                 empByDeptQuestions();
                 break;
             case "deptSalary":
-                viewDeptSalary(mainMenu);
+                queries.viewDeptSalary(mainMenu);
                 break;
             case "addDept":
                 addDeptQuestions();
                 break;
+            case "deleteDepartment":
+                areYouSure("department");
+                break;
             case "addRole":
                 addRoleQuestions();
+                break;
+            case "deleteRole":
+                areYouSure("role");
                 break;
             case "addEmpl":
                 addEmplQuestions();
@@ -68,14 +65,56 @@ function mainMenu(){
             case "updEmpl":
                 updateEmplQuestions(true);
                 break;
+            case "deleteEmpl":
+                areYouSure("employee");
+                break;
             case "close":
                 process.exit();
         }
     });
 }
 
+function areYouSure(deleteElement){
+    let n = "";
+    if(deleteElement == "employee"){
+        n = "n";
+    }
+
+    inquirer
+    .prompt([
+        {
+            type: "list",
+            message: `Are you sure you want to delete a${n} ${deleteElement}?`,
+            name: "areYouSure",
+            choices: [
+                {name: "Yes", value: true},
+                {name: "No", value: false}
+            ]
+        }
+    ])
+    .then((response) => {
+
+        if(response.areYouSure){
+            switch(deleteElement){
+                case "department":
+                    deleteDeptQuestions();
+                    break;
+                case "role":
+                    deleteRoleQuestions();
+                    break;
+                case "employee":
+                    deleteEmployeeQuestions();
+                    break;
+            }
+        }
+        else{
+            mainMenu();
+        }
+    });
+}
+
 function empByManQuestions(){
-    viewEmployees((result) => {
+    queries.viewEmployees((result) => {
         let managerChoices = [];
 
         for(let i = 0; i < result.length; i++){
@@ -92,13 +131,13 @@ function empByManQuestions(){
             }
         ])
         .then((response) => {
-            viewEmpByMan(response.manager, mainMenu);
+            queries.viewEmpByMan(response.manager, mainMenu);
         });
     }, false)
 }
 
 function empByDeptQuestions(){
-    viewDepartments((result) => {
+    queries.viewDepartments((result) => {
         let deptChoices = [];
 
         for(let i = 0; i < result.length; i++){
@@ -115,7 +154,7 @@ function empByDeptQuestions(){
             }
         ])
         .then((response) => {
-            viewEmpByDept(response.department, mainMenu);
+            queries.viewEmpByDept(response.department, mainMenu);
         });
     }, false)
 }
@@ -130,12 +169,35 @@ function addDeptQuestions(){
         }
     ])
     .then((response) => {
-        addDept(response.deptName, mainMenu);
+        queries.addDept(response.deptName, mainMenu);
     });
 }
 
+function deleteDeptQuestions(){
+    queries.viewDepartments((result) => {
+        let deptChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            deptChoices.push({name: result[i].Department, value: result[i].Department_ID});
+        }
+        
+        inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "What department do you want to delete?",
+                name: "department",
+                choices: deptChoices
+            }
+        ])
+        .then((response) => {
+            queries.deleteDept(response.department, mainMenu);
+        });
+    }, false)
+}
+
 function addRoleQuestions(){
-    viewDepartments((result) => {
+    queries.viewDepartments((result) => {
         let deptChoices = [];
 
         for(let i = 0; i < result.length; i++){
@@ -162,20 +224,43 @@ function addRoleQuestions(){
             }
         ])
         .then((response) => {
-            addRole(response.roleName, response.salary, response.department, mainMenu);
+            queries.addRole(response.roleName, response.salary, response.department, mainMenu);
         });
     }, false)
 }
 
-function addEmplQuestions(){
-    viewRoles((result) => {
+function deleteRoleQuestions(){
+    queries.viewRoles((result) => {
         let roleChoices = [];
 
         for(let i = 0; i < result.length; i++){
             roleChoices.push({name: result[i].Job_Title, value: result[i].Role_ID});
         }
 
-        viewEmployees((result) => {
+        inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "Which role would you like to delete?",
+                name: "role",
+                choices: roleChoices
+            }
+        ])
+        .then((response) => {
+            queries.deleteRole(response.role, mainMenu);
+        });
+    }, false)
+}
+
+function addEmplQuestions(){
+    queries.viewRoles((result) => {
+        let roleChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            roleChoices.push({name: result[i].Job_Title, value: result[i].Role_ID});
+        }
+
+        queries.viewEmployees((result) => {
             let managerChoices = [];
 
             for(let i = 0; i < result.length; i++){
@@ -208,21 +293,21 @@ function addEmplQuestions(){
                 }
             ])
             .then((response) => {
-                addEmpl(response.firstName, response.lastName, response.emplRole, response.emplManager, mainMenu);
+                queries.addEmpl(response.firstName, response.lastName, response.emplRole, response.emplManager, mainMenu);
             });
         }, false)
     }, false)
 }
 
 function updateEmplQuestions(){
-    viewRoles((result) => {
+    queries.viewRoles((result) => {
         let roleChoices = [];
 
         for(let i = 0; i < result.length; i++){
             roleChoices.push({name: result[i].Job_Title, value: result[i].Role_ID});
         }
 
-        viewEmployees((result) => {
+        queries.viewEmployees((result) => {
             let emplChoices = [];
 
             for(let i = 0; i < result.length; i++){
@@ -251,9 +336,32 @@ function updateEmplQuestions(){
                 }
             ])
             .then((response) => {
-                updateEmpl(response.emplUpd, response.emplRole, response.emplManager, mainMenu);
+                queries.updateEmpl(response.emplUpd, response.emplRole, response.emplManager, mainMenu);
             });
         }, false)
+    }, false)
+}
+
+function deleteEmployeeQuestions(){
+    queries.viewEmployees((result) => {
+        let emplChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            emplChoices.push({name: result[i].First_Name + " " + result[i].Last_Name, value: result[i].Employee_ID});
+        }
+
+        inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "Which employee would you like to delete?",
+                name: "employee",
+                choices: emplChoices
+            }
+        ])
+        .then((response) => {
+            queries.deleteEmpl(response.employee, mainMenu);
+        });
     }, false)
 }
 
