@@ -1,5 +1,14 @@
 const inquirer = require('inquirer');
-const {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl, updateEmpl} = require("./queries.js");
+const {
+    viewDepartments, 
+    viewRoles, 
+    viewEmployees, 
+    viewEmpByMan,
+    addDept, 
+    addRole, 
+    addEmpl, 
+    updateEmpl
+} = require("./queries.js");
 
 function mainMenu(){
     inquirer
@@ -12,10 +21,15 @@ function mainMenu(){
                 {name: "View all departments", value: "viewDept"},
                 {name: "View all roles", value: "viewRoles"},
                 {name: "View all employees", value: "viewEmpl"},
+                {name: "View employees by manager", value: "empByMan"},
                 {name: "Add a department", value: "addDept"},
                 {name: "Add a role", value: "addRole"},
                 {name: "Add an Employee", value: "addEmpl"},
                 {name: "Update Employee Information", value:"updEmpl"},
+                // view employees by manager
+                // view employees by department
+                // delete departments, roles, and employees
+                // view combined salaries of dept
                 {name: "Close application", value: "close"}
             ]
         }
@@ -30,6 +44,9 @@ function mainMenu(){
                 break;
             case "viewEmpl":
                 viewEmployees(mainMenu);
+                break;
+            case "empByMan":
+                empByManQuestions();
                 break;
             case "addDept":
                 addDeptQuestions();
@@ -47,6 +64,29 @@ function mainMenu(){
                 process.exit();
         }
     });
+}
+
+function empByManQuestions(){
+    viewEmployees((result) => {
+        let managerChoices = [];
+
+        for(let i = 0; i < result.length; i++){
+            managerChoices.push({name: result[i].First_Name + " " + result[i].Last_Name, value: result[i].Employee_ID});
+        }
+
+        inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "Whose employees would you like to view?",
+                name: "manager",
+                choices: managerChoices
+            }
+        ])
+        .then((response) => {
+            viewEmpByMan(response.manager, mainMenu);
+        });
+    }, false)
 }
                       
 function addDeptQuestions(){

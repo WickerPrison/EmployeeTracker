@@ -57,6 +57,22 @@ function viewEmployees(callback, showTable = true){
     });
 }
 
+function viewEmpByMan(manager_id, callback){
+    db.query(`SELECT employee.id AS Employee_ID, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Job_Title, role.salary AS Salary, department.name AS Department
+    FROM employee 
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id
+    WHERE employee.manager_id = ?`, manager_id, (err, result) => {
+        if(err) {
+            console.log(err);
+        }
+        else{
+            console.table(result);
+            callback();
+        }
+    });
+}
+
 function addDept(name, callback){
     db.query(`INSERT INTO department (name) VALUES (?)`, name, (err, result) =>{
         if(err) {
@@ -70,7 +86,7 @@ function addDept(name, callback){
 }
 
 function addRole(title, salary, department_id, callback){
-    db.query(`INSERT INTO role (title, salary, department_id) VALUES ("?", ${salary}, ${department_id})`, title, (err, result) =>{
+    db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [title, salary, department_id], (err, result) =>{
         if(err) {
             console.log(err);
         }
@@ -83,7 +99,7 @@ function addRole(title, salary, department_id, callback){
 
 function addEmpl(first_name, last_name, role_id, manager_id, callback){
     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
-    VALUES("${first_name}", "${last_name}", "${role_id}", "${manager_id}")`, (err, result) => {
+    VALUES(?, ?, ?, ?)`, [first_name, last_name, role_id, manager_id], (err, result) => {
         if(err){
             console.log(err);
         }
@@ -106,4 +122,13 @@ function updateEmpl(employee_id, role_id, manager_id, callback){
     })
 }
 
-module.exports = {viewDepartments, viewRoles, viewEmployees, addDept, addRole, addEmpl, updateEmpl}
+module.exports = {
+    viewDepartments, 
+    viewRoles, 
+    viewEmployees,
+    viewEmpByMan, 
+    addDept, 
+    addRole, 
+    addEmpl, 
+    updateEmpl
+}
